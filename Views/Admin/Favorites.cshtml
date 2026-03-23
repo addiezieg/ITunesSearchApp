@@ -1,0 +1,143 @@
+@model ITunesSearchApp.Models.AdminFavoritesViewModel
+
+@{
+    ViewData["Title"] = "Admin Favorites";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Admin - Addie's Favorites</h1>
+        <p class="text-muted fs-5">
+            Search iTunes albums, add favorites, and manage your featured collection.
+        </p>
+    </div>
+
+    <!-- Search -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8 col-lg-6">
+            <form method="get" asp-action="Favorites" asp-controller="Admin">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text"
+                           name="searchTerm"
+                           class="form-control"
+                           value="@Model.SearchTerm"
+                           placeholder="Search iTunes albums" />
+                    <button type="submit" class="btn btn-dark">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.SearchResults != null && Model.SearchResults.Any())
+    {
+        <div class="mb-4">
+            <h2 class="fw-bold mb-3">Search Results</h2>
+        </div>
+
+        <div class="row g-4 mb-5">
+            @foreach (var album in Model.SearchResults)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                        @if (!string.IsNullOrWhiteSpace(album.ArtworkUrl100))
+                        {
+                            <img src="@album.ArtworkUrl100.Replace("100x100", "300x300")"
+                                 class="card-img-top"
+                                 alt="@album.CollectionName"
+                                 style="height: 260px; object-fit: cover;" />
+                        }
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-semibold">@album.CollectionName</h5>
+
+                            <p class="card-text text-muted mb-1">
+                                <strong>Artist:</strong> @album.ArtistName
+                            </p>
+
+                            <p class="card-text text-muted mb-3">
+                                <strong>Released:</strong> @album.ReleaseDate.ToShortDateString()
+                            </p>
+
+                            <form method="post" asp-action="AddFavorite" asp-controller="Admin" class="mt-auto">
+                                <input type="hidden" name="itunesCollectionId" value="@album.CollectionId" />
+                                <input type="hidden" name="collectionName" value="@album.CollectionName" />
+                                <input type="hidden" name="artistName" value="@album.ArtistName" />
+                                <input type="hidden" name="artworkUrl100" value="@album.ArtworkUrl100" />
+                                <input type="hidden" name="releaseDate" value="@album.ReleaseDate.ToString("o")" />
+                                <input type="hidden" name="primaryGenreName" value="@album.PrimaryGenreName" />
+                                <button type="submit" class="btn btn-outline-dark w-100 rounded-pill">
+                                    Add to Favorites
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="mb-4">
+        <h2 class="fw-bold mb-3">Current Favorites</h2>
+    </div>
+
+    @if (Model.CurrentFavorites != null && Model.CurrentFavorites.Any())
+    {
+        <div class="row g-4">
+            @foreach (var album in Model.CurrentFavorites)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                        @if (!string.IsNullOrWhiteSpace(album.ArtworkUrl100))
+                        {
+                            <img src="@album.ArtworkUrl100.Replace("100x100", "300x300")"
+                                 class="card-img-top"
+                                 alt="@album.CollectionName"
+                                 style="height: 260px; object-fit: cover;" />
+                        }
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-semibold">@album.CollectionName</h5>
+
+                            <p class="card-text text-muted mb-1">
+                                <strong>Artist:</strong> @album.ArtistName
+                            </p>
+
+                            <p class="card-text text-muted mb-1">
+                                <strong>Order:</strong> @album.DisplayOrder
+                            </p>
+
+                            <p class="card-text text-muted mb-3">
+                                <strong>Featured:</strong> @(album.IsFeatured ? "Yes" : "No")
+                            </p>
+
+                            <div class="mt-auto d-flex gap-2">
+                                <a asp-action="EditFavorite"
+                                   asp-controller="Admin"
+                                   asp-route-id="@album.Id"
+                                   class="btn btn-outline-dark rounded-pill w-100">
+                                    Edit
+                                </a>
+
+                                <form method="post"
+                                      asp-action="DeleteFavorite"
+                                      asp-controller="Admin"
+                                      class="w-100">
+                                    <input type="hidden" name="id" value="@album.Id" />
+                                    <button type="submit" class="btn btn-outline-danger rounded-pill w-100">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center mt-4">
+            <p class="fs-5 text-muted">No favorites yet.</p>
+        </div>
+    }
+</div>

@@ -1,0 +1,87 @@
+@model ITunesSearchApp.Models.FavoriteAlbum
+
+@{
+    ViewData["Title"] = "Edit Favorite";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+
+                <!-- Image -->
+                @if (!string.IsNullOrWhiteSpace(Model.ArtworkUrl100))
+                {
+                    <img src="@Model.ArtworkUrl100.Replace("100x100", "600x600")"
+                         class="card-img-top"
+                         alt="@Model.CollectionName"
+                         style="height: 300px; object-fit: cover;" />
+                }
+
+                <div class="card-body p-4 p-md-5">
+
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h1 class="h3 fw-bold mb-1">@Model.CollectionName</h1>
+                        <p class="text-muted">@Model.ArtistName</p>
+                    </div>
+
+                    <!-- Form -->
+                    <form method="post" asp-action="EditFavorite" asp-controller="Admin">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Note -->
+                        <div class="mb-4">
+                            <label asp-for="Note" class="form-label fw-semibold">Note</label>
+                            <textarea asp-for="Note"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Why do you love this album?"></textarea>
+                        </div>
+
+                        <!-- Display Order -->
+                        <div class="mb-4">
+                            <label asp-for="DisplayOrder" class="form-label fw-semibold">Display Order</label>
+                            <input asp-for="DisplayOrder"
+                                   type="number"
+                                   class="form-control" />
+                        </div>
+
+                        <!-- Featured Toggle -->
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="IsFeatured"
+                                   class="form-check-input"
+                                   type="checkbox" />
+                            <label asp-for="IsFeatured" class="form-check-label fw-semibold">
+                                Featured Album
+                            </label>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit"
+                                    class="btn btn-dark rounded-pill w-100">
+                                Save Changes
+                            </button>
+
+                            <a asp-action="Favorites"
+                               asp-controller="Admin"
+                               class="btn btn-outline-secondary rounded-pill w-100">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

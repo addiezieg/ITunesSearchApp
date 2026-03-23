@@ -1,0 +1,89 @@
+@model ITunesSearchApp.Models.FavoriteDetailsViewModel
+
+@{
+    ViewData["Title"] = Model?.Favorite?.CollectionName ?? "Favorite Details";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a asp-action="Index" asp-controller="Favorites" class="btn btn-outline-secondary rounded-pill">
+            ← Back to Favorites
+        </a>
+    </div>
+
+    @if (Model?.Favorite != null)
+    {
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="row g-0">
+                <div class="col-lg-5 bg-light p-4 p-lg-5">
+                    <div class="album-art-sticky d-flex align-items-start justify-content-center">
+                        @if (!string.IsNullOrWhiteSpace(Model.Favorite.ArtworkUrl100))
+                        {
+                            <img src="@Model.Favorite.ArtworkUrl100.Replace("100x100", "400x400")"
+                                 alt="@Model.Favorite.CollectionName"
+                                 class="img-fluid rounded-4 shadow album-art-large" />
+                        }
+                        else
+                        {
+                            <div class="text-muted">No artwork available</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card-body p-4 p-lg-5">
+                        <h1 class="display-5 fw-bold mb-3">@Model.Favorite.CollectionName</h1>
+
+                        <div class="mb-4">
+                            <p class="mb-2"><strong>Artist:</strong> @Model.Favorite.ArtistName</p>
+
+                            @if (Model.Favorite.ReleaseDate.HasValue)
+                            {
+                                <p class="mb-2"><strong>Release Date:</strong> @Model.Favorite.ReleaseDate.Value.ToShortDateString()</p>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Favorite.PrimaryGenreName))
+                            {
+                                <p class="mb-2"><strong>Genre:</strong> @Model.Favorite.PrimaryGenreName</p>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Favorite.Note))
+                            {
+                                <p class="mb-0"><strong>Addie's Note:</strong> @Model.Favorite.Note</p>
+                            }
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h2 class="h4 fw-semibold mb-3">Track List</h2>
+
+                        @if (Model.Songs != null && Model.Songs.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var song in Model.Songs.OrderBy(s => s.TrackNumber))
+                                {
+                                    <div class="list-group-item px-0 py-3 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-dark rounded-pill me-3">@song.TrackNumber</span>
+                                            <span>@song.TrackName</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No tracks found for this album.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm rounded-4">
+            Favorite not found.
+        </div>
+    }
+</div>

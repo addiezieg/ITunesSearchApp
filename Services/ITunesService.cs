@@ -14,92 +14,67 @@ namespace ITunesSearchApp.Services
 
         public async Task<List<Album>> SearchAlbumsAsync(string searchTerm)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-            {
-                searchTerm = "Taylor Swift";
-            }
+            var response = await _httpClient.GetAsync(
+                $"https://itunes.apple.com/search?term={Uri.EscapeDataString(searchTerm)}&entity=album&limit=25");
 
-            var url = $"https://itunes.apple.com/search?term={Uri.EscapeDataString(searchTerm)}&entity=album&limit=25";
+            response.EnsureSuccessStatusCode();
 
-            try
-            {
-                var response = await _httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
 
-                var content = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ITunesSearchResponse<Album>>(
+                content,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                var result = JsonSerializer.Deserialize<ITunesSearchResponse<Album>>(
-                    content,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                return result?.Results ?? new List<Album>();
-            }
-            catch
-            {
-                return new List<Album>();
-            }
+            return result?.Results ?? new List<Album>();
         }
 
-        public async Task<AlbumDetailViewModel> GetAlbumDetailsAsync(int collectionId)
+        public async Task<AlbumDetailViewModel?> GetAlbumDetailsAsync(long collectionId)
         {
-            var model = new AlbumDetailViewModel();
+            var response = await _httpClient.GetAsync(
+                $"https://itunes.apple.com/lookup?id={collectionId}&entity=song");
 
-            var url = $"https://itunes.apple.com/lookup?id={collectionId}&entity=song";
+            response.EnsureSuccessStatusCode();
 
-            try
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonSerializer.Deserialize<ITunesSearchResponse<Song>>(
+                content,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (result?.Results == null || result.Results.Count == 0)
             {
-                var response = await _httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-
-                var content = await response.Content.ReadAsStringAsync();
-
-                using var doc = JsonDocument.Parse(content);
-                var results = doc.RootElement.GetProperty("results");
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-
-                foreach (var item in results.EnumerateArray())
-                {
-                    if (item.TryGetProperty("wrapperType", out var wrapperType))
-                    {
-                        var wrapperTypeValue = wrapperType.GetString();
-
-                        if (wrapperTypeValue == "collection")
-                        {
-                            var album = JsonSerializer.Deserialize<Album>(item.GetRawText(), options);
-                            if (album != null)
-                            {
-                                model.Album = album;
-                            }
-                        }
-                        else if (wrapperTypeValue == "track")
-                        {
-                            var song = JsonSerializer.Deserialize<Song>(item.GetRawText(), options);
-                            if (song != null)
-                            {
-                                model.Songs.Add(song);
-                            }
-                        }
-                    }
-                }
-
-                if (model.Album == null)
-                {
-                    model.ErrorMessage = "Album not found.";
-                }
-            }
-            catch
-            {
-                model.ErrorMessage = "Error loading album details.";
+                return null;
             }
 
-            return model;
+            var albumInfo = result.Results.FirstOrDefault(x => x.WrapperType == "collection");
+            var songs = result.Results.Where(x => x.WrapperType == "track").ToList();
+
+            if (albumInfo == null)
+            {
+                return null;
+            }
+
+            var album = new Album
+            {
+                CollectionId = albumInfo.CollectionId,
+                CollectionName = albumInfo.CollectionName,
+                ArtistName = albumInfo.ArtistName,
+                ArtworkUrl100 = albumInfo.ArtworkUrl100,
+                ReleaseDate = albumInfo.ReleaseDate,
+                PrimaryGenreName = albumInfo.PrimaryGenreName
+            };
+
+            return new AlbumDetailViewModel
+            {
+                Album = album,
+                Songs = songs
+            };
+        }
+
+        public async Task<List<Song>> GetAlbumSongsAsync(long collectionId)
+        {
+            var details = await GetAlbumDetailsAsync(collectionId);
+            return details?.Songs ?? new List<Song>();
         }
     }
 }
