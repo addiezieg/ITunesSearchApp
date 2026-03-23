@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "ITunes Album Search";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Albums</h1>
+</div>
+<div>
+    <form method="get">
+        <input type="text" name="term" placeholder="Search for albums..." value="@ViewData["CurrentSearchTerm"]" />
+        <button type="submit">Search</button>
+    </form>
+
+    @foreach (var album in Model)
+    {
+        <div>
+            <h2>@album.CollectionName</h2>
+            <img src="@album.ArtworkUrl100" alt="@album.CollectionName" />
+            <p>Artist: @album.ArtistName</p>
+            <p>Release Date: @album.ReleaseDate.ToShortDateString()</p>
+            <a href="/Album/Details/@album.CollectionId">View Details</a>
+        </div>
+    }
+</div>
