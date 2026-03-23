@@ -1,36 +1,76 @@
 @model ITunesSearchApp.Models.AlbumDetailViewModel
 
-<a href="/">Back to Search</a>
+@{
+    ViewData["Title"] = Model?.Album?.CollectionName ?? "Album Details";
+}
 
-@if (Model?.Album != null)
-{
-    <h1>@Model.Album.CollectionName</h1>
-    <p>Artist: @Model.Album.ArtistName</p>
-    <p>Release Date: @Model.Album.ReleaseDate.ToShortDateString()</p>
-    <p>Genre: @Model.Album.PrimaryGenreName</p>
+<div class="container py-5">
+    <div class="mb-4">
+        <a asp-action="Index" asp-controller="Album" class="btn btn-outline-secondary rounded-pill">
+            ← Back to Search
+        </a>
+    </div>
 
-    @if (!string.IsNullOrWhiteSpace(Model.Album.ArtworkUrl100))
+    @if (Model?.Album != null)
     {
-        <img src="@Model.Album.ArtworkUrl100.Replace("100x100", "300x300")" alt="Album Artwork" />
-    }
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="row g-0">
+                <div class="col-lg-5 bg-light p-4 p-lg-5">
+                    <div class="album-art-sticky d-flex align-items-start justify-content-center">
+                        @if (!string.IsNullOrWhiteSpace(Model.Album.ArtworkUrl100))
+                        {
+                            <img src="@Model.Album.ArtworkUrl100.Replace("100x100", "400x400")"
+                                 alt="@Model.Album.CollectionName"
+                                 class="img-fluid rounded-4 shadow album-art-large" />
+                        }
+                        else
+                        {
+                            <div class="text-muted">No artwork available</div>
+                        }
+                    </div>
+                </div>
 
-    <h2>Track List</h2>
+                <div class="col-lg-7">
+                    <div class="card-body p-4 p-lg-5">
+                        <h1 class="display-5 fw-bold mb-3">@Model.Album.CollectionName</h1>
 
-    @if (Model.Songs != null && Model.Songs.Any())
-    {
-        <ul>
-            @foreach (var song in Model.Songs)
-            {
-                <li>@song.TrackNumber. @song.TrackName</li>
-            }
-        </ul>
+                        <div class="mb-4">
+                            <p class="mb-2"><strong>Artist:</strong> @Model.Album.ArtistName</p>
+                            <p class="mb-2"><strong>Release Date:</strong> @Model.Album.ReleaseDate.ToShortDateString()</p>
+                            <p class="mb-0"><strong>Genre:</strong> @Model.Album.PrimaryGenreName</p>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h2 class="h4 fw-semibold mb-3">Track List</h2>
+
+                        @if (Model.Songs != null && Model.Songs.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var song in Model.Songs.OrderBy(s => s.TrackNumber))
+                                {
+                                    <div class="list-group-item px-0 py-3 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-dark rounded-pill me-3">@song.TrackNumber</span>
+                                            <span>@song.TrackName</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No tracks found for this album.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     }
     else
     {
-        <p>No tracks found for this album.</p>
+        <div class="alert alert-warning shadow-sm rounded-4">
+            @Model?.ErrorMessage
+        </div>
     }
-}
-else
-{
-    <p>@Model?.ErrorMessage</p>
-}
+</div>
