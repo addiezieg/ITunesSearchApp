@@ -4,50 +4,94 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ITunes Search App</title>
+
     <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ITunesSearchApp.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="/">ITunes Search App</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold" asp-controller="Album" asp-action="Index">
+                    ITunes Search
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
+                <!-- Nav Items -->
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav gap-2">
+
+                        <!-- Search -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="/" asp-action="Index">Home</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "fw-bold text-dark" : "text-muted")"
+                               asp-controller="Album"
+                               asp-action="Index">
+                                Search
+                            </a>
                         </li>
+
+                        <!-- Popular -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Favorites" asp-action="Index">Addie's Favorites</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Popular" ? "fw-bold text-dark" : "text-muted")"
+                               asp-controller="Popular"
+                               asp-action="Index">
+                                Popular Albums
+                            </a>
                         </li>
+
+                        <!-- Favorites -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Admin" asp-action="Favorites">Admin - Manage Favorites</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Favorites" ? "fw-bold text-dark" : "text-muted")"
+                               asp-controller="Favorites"
+                               asp-action="Index">
+                                Addie's Favorites
+                            </a>
                         </li>
+
+                        <!-- Admin -->
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "fw-bold text-dark" : "text-muted")"
+                               asp-controller="Admin"
+                               asp-action="Favorites">
+                                Admin
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- Main Content -->
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-4">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ITunesSearchApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Footer -->
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container text-center py-3">
+            &copy; 2026 - ITunesSearchApp |
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

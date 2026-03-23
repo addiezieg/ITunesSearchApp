@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ITunesSearchApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a424aa9b4aa04e052156ca445fb84113704d1d6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6c74e175e87a72022651d1c00f06db1400db9f1")]
 [assembly: System.Reflection.AssemblyProductAttribute("ITunesSearchApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ITunesSearchApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

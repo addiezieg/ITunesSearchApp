@@ -6,20 +6,28 @@
 
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">iTunes Album Search</h1>
-        <p class="text-muted fs-5">Search for your favorite artists and browse their albums.</p>
+        <h1 class="display-4 fw-bold">Album Search</h1>
+        <p class="text-muted fs-5">Search ITunes for your favorite artists and browse their albums.</p>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+        <a asp-controller="Album" asp-action="Index" class="btn btn-dark rounded-pill px-4">
+            Search Albums
+        </a>
+        <a asp-controller="Popular" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4">
+            Popular Albums
+        </a>
     </div>
 
     <div class="row justify-content-center mb-5">
         <div class="col-md-8 col-lg-6">
             <form method="get" asp-action="Index" asp-controller="Album">
                 <div class="input-group input-group-lg shadow-sm">
-                    <input
-                        type="text"
-                        name="term"
-                        class="form-control"
-                        placeholder="Search for albums or artists..."
-                        value="@ViewData["CurrentSearchTerm"]" />
+                    <input type="text"
+                           name="term"
+                           class="form-control"
+                           placeholder="Search for albums or artists..."
+                           value="@ViewData["CurrentSearchTerm"]" />
                     <button class="btn btn-dark" type="submit">Search</button>
                 </div>
             </form>
@@ -40,14 +48,20 @@
 
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title fw-semibold">@album.CollectionName</h5>
+
                             <p class="card-text text-muted mb-1">
                                 <strong>Artist:</strong> @album.ArtistName
                             </p>
+
                             <p class="card-text text-muted mb-3">
                                 <strong>Released:</strong> @album.ReleaseDate.ToShortDateString()
                             </p>
 
-                            <a href="/Album/Details/@album.CollectionId" class="btn btn-outline-dark mt-auto rounded-pill">
+                            <a asp-controller="Album"
+                               asp-action="Details"
+                               asp-route-id="@album.CollectionId"
+                               asp-route-source="search"
+                               class="btn btn-outline-dark mt-auto rounded-pill">
                                 View Details
                             </a>
                         </div>

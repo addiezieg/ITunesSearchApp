@@ -28,6 +28,41 @@ namespace ITunesSearchApp.Services
             return result?.Results ?? new List<Album>();
         }
 
+        public async Task<List<Album>> GetTopAlbumsAsync()
+{
+    var url = "https://rss.marketingtools.apple.com/api/v2/us/music/most-played/50/albums.json";
+
+    var response = await _httpClient.GetAsync(url);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        var errorBody = await response.Content.ReadAsStringAsync();
+        throw new Exception($"Apple RSS request failed. Status: {(int)response.StatusCode} {response.ReasonPhrase}. Response: {errorBody}");
+    }
+
+    var content = await response.Content.ReadAsStringAsync();
+
+    var result = JsonSerializer.Deserialize<TopAlbumsResponse>(
+        content,
+        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+    if (result?.Feed?.Results == null)
+    {
+        return new List<Album>();
+    }
+
+    return result.Feed.Results.Select(album => new Album
+    {
+        CollectionId = long.TryParse(album.Id, out var parsedId) ? parsedId : -1,
+        CollectionName = album.Name,
+        ArtistName = album.ArtistName,
+        ArtworkUrl100 = album.ArtworkUrl100,
+        ReleaseDate = DateTime.TryParse(album.ReleaseDate, out var parsedDate)
+            ? parsedDate
+            : DateTime.MinValue,
+        PrimaryGenreName = string.Empty
+    }).ToList();
+}
         public async Task<AlbumDetailViewModel?> GetAlbumDetailsAsync(long collectionId)
         {
             var response = await _httpClient.GetAsync(

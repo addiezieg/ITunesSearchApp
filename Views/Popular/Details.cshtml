@@ -2,23 +2,13 @@
 
 @{
     ViewData["Title"] = Model?.Album?.CollectionName ?? "Album Details";
-    var source = ViewData["Source"]?.ToString() ?? "search";
 }
 
 <div class="container py-5">
     <div class="mb-4">
-        @if (source == "popular")
-        {
-            <a asp-controller="Popular" asp-action="Index" class="btn btn-outline-secondary rounded-pill">
-                ← Back to Top Albums
-            </a>
-        }
-        else
-        {
-            <a asp-controller="Album" asp-action="Index" class="btn btn-outline-secondary rounded-pill">
-                ← Back to Search
-            </a>
-        }
+        <a asp-action="Index" asp-controller="Popular" class="btn btn-outline-secondary rounded-pill">
+            ← Back to Popular Albums
+        </a>
     </div>
 
     @if (Model?.Album != null)
@@ -30,8 +20,7 @@
                         @if (!string.IsNullOrWhiteSpace(Model.Album.ArtworkUrl100))
                         {
                             <img src="@Model.Album.ArtworkUrl100.Replace("100x100", "400x400")"
-                                 alt="@Model.Album.CollectionName"
-                                 class="img-fluid rounded-4 shadow album-art-large" />
+                                 alt="@Model.Album.CollectionName" class="img-fluid rounded-4 shadow album-art-large" />
                         }
                         else
                         {
